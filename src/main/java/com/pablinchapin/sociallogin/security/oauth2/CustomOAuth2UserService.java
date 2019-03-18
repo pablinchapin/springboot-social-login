@@ -5,9 +5,12 @@
  */
 package com.pablinchapin.sociallogin.security.oauth2;
 
-import com.pablinchapin.sociallogin.UserRepository;
+
 import com.pablinchapin.sociallogin.entity.AuthProvider;
 import com.pablinchapin.sociallogin.entity.User;
+import com.pablinchapin.sociallogin.exception.OAuth2AuthenticationProcessingException;
+import com.pablinchapin.sociallogin.repository.UserRepository;
+import com.pablinchapin.sociallogin.security.UserPrincipal;
 import com.pablinchapin.sociallogin.security.oauth2.user.OAuth2UserInfo;
 import com.pablinchapin.sociallogin.security.oauth2.user.OAuth2UserInfoFactory;
 import java.util.Optional;
@@ -39,6 +42,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
         try{
             return processOAuth2User(oAuth2UserRequest, oAuth2User);
         }catch(AuthenticationException ex){
+            throw ex;
+        }catch(Exception ex){
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     
@@ -49,7 +54,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getClientId(), oAuth2User.getAttributes());
         
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())){
-            //throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
         
         Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
@@ -58,14 +63,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
         if(userOptional.isPresent()){
             user = userOptional.get();
             if(!user.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))){
-            
+                throw new OAuth2AuthenticationProcessingException("Looks like you[re signed up wity " +
+                        user.getProvider() + " account. Please user your " +user.getProvider() +
+                        " account to login.");
             }
-            
-            //user 
+            user = updateExistingUser(user, oAuth2UserInfo);
+        } else {
+            user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
         
         
-        return null;
+        return UserPrincipal.create(user, oAuth2User.getAttributes());
     }
     
     

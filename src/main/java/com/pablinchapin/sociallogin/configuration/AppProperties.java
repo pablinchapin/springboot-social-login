@@ -21,15 +21,15 @@ public class AppProperties {
     private final OAuth2 oauth2 = new OAuth2();
     
     public static class Auth{
-        private String tokeSecret;
+        private String tokenSecret;
         private long tokenExpirationMS;
 
         public String getTokeSecret() {
-            return tokeSecret;
+            return tokenSecret;
         }
 
-        public void setTokeSecret(String tokeSecret) {
-            this.tokeSecret = tokeSecret;
+        public void setTokeSecret(String tokenSecret) {
+            this.tokenSecret = tokenSecret;
         }
 
         public long getTokenExpirationMS() {
