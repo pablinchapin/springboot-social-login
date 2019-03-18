@@ -5,6 +5,8 @@
  */
 package com.pablinchapin.sociallogin.security.oauth2.user;
 
+import com.pablinchapin.sociallogin.entity.AuthProvider;
+import com.pablinchapin.sociallogin.exception.OAuth2AuthenticationProcessingException;
 import java.util.Map;
 
 /**
@@ -16,28 +18,16 @@ public class OAuth2UserInfoFactory {
 
     public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes){
         
-        //if(registrationId.equalsIgnoreCase(registrationId))
-        return new OAuth2UserInfo(attributes) {
-            @Override
-            public String getId() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public String getName() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public String getEmail() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public String getImageUrl() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        };
+        if(registrationId.equalsIgnoreCase(AuthProvider.google.toString())){
+            return new GoogleOAuth2UserInfo(attributes);
+        }else if(registrationId.equalsIgnoreCase(AuthProvider.facebook.toString())){
+            return new FacebookOAuth2UserInfo(attributes);
+        }else if(registrationId.equalsIgnoreCase(AuthProvider.github.toString())){
+            return new GithubOAuth2UserInfo(attributes);
+        }else{
+            throw new OAuth2AuthenticationProcessingException("Sorry! Login with "+ registrationId + " is not supported");
+        }
+        
     }
     
 }
