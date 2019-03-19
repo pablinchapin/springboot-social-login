@@ -24,11 +24,12 @@ public class AppProperties {
         private String tokenSecret;
         private long tokenExpirationMS;
 
-        public String getTokeSecret() {
+        
+        public String getTokenSecret() {
             return tokenSecret;
         }
 
-        public void setTokeSecret(String tokenSecret) {
+        public void setTokenSecret(String tokenSecret) {
             this.tokenSecret = tokenSecret;
         }
 
@@ -59,16 +60,16 @@ public class AppProperties {
 
     }
 
+    
     public Auth getAuth() {
         return auth;
     }
 
+    
     public OAuth2 getOauth2() {
         return oauth2;
     }
 
-    
-    
     
     
 }
